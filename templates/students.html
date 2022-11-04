@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Students</title>
+</head>
+<body>
+
+    <h1>We sure do have students</h1>
+    {% for student in students %}
+        <p>{{ student }}</p>
+    {% endfor %}
+
+    <input id='student-name'> <button onclick="addStudent()">Add a student</button>
+
+    <script>
+
+        function addStudent() {
+            fetch('add-student', { //this is a javascript object
+                method: 'POST',
+                body: document.getElementById('student-name').value
+            }).then(response => response);
+            location.reload()
+        }
+
+    </script>
+
+
+</body>
+</html>

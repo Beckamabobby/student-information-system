@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request, Response
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -50,7 +50,7 @@ class Section(db.Model):
 db.drop_all()
 db.create_all()
 
-tea1 = Teacher(name='Gerard')
+tea1 = Teacher(name='Gerard')  # creates an instance of the teacher class and assigns it to a variable
 tea2 = Teacher(name='Giles')
 cor1 = Course(name='Math')
 cor2 = Course(name='English')
@@ -68,8 +68,35 @@ stu2.sections.append(sec2)
 db.session.add_all([stu1])
 db.session.commit()
 
-for student in Student.query.all():
-    print(student)
-    print('Sections:')
-    for section in student.sections:
-        print(f'\t{section}')
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/teachers')
+def teachers():
+    return render_template('teachers.html', teachers=Teacher.query.all())
+
+@app.route('/students')
+def students():
+    return render_template('students.html', students=Student.query.all())
+
+@app.route('/add-teacher', methods=['POST'])
+def add_teacher():
+    new_teacher = Teacher(name=request.get_data().decode('utf-8'))
+    db.session.add(new_teacher)
+    db.session.commit()
+    return Response()
+
+@app.route('/add-student', methods=['POST'])
+def add_student():
+    name = request.get_data().decode('utf-8').split()
+    if len(name) == 2:
+        first_name, last_name = request.get_data().decode('utf-8').split()
+        new_student = Student(first_name=first_name, last_name=last_name)
+        db.session.add(new_student)
+        db.session.commit()
+        return Response()
+    else:
+        return Response(status=400)
+
+app.run(debug=True)
